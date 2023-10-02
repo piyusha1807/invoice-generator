@@ -8,7 +8,7 @@ import Card from 'react-bootstrap/Card';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { BiShowAlt, BiEditAlt, BiTrash } from "react-icons/bi";
+import { BiWindowOpen, BiShowAlt, BiEditAlt, BiTrash } from "react-icons/bi";
 import {deleteInvoice} from '../store/actions/invoiceActions';
 import InvoiceModal from './InvoiceModal';
 
@@ -87,6 +87,7 @@ const InvoiceList = () => {
                         return (
                           <td key={item.key}>
                             <div className="d-flex justify-content-flex-start gap-1">
+                            <BiWindowOpen style={{height: '23px', width: '23px', padding: '4.5px'}} className="text-white btn btn-primary"  onClick={() => navigate(`form/create/${invoice.id}`)}/>
                             <BiShowAlt style={{height: '23px', width: '23px', padding: '4.5px'}} className="text-white btn btn-primary" onClick={() => handleView(invoice.id)} />
                             <BiEditAlt style={{height: '23px', width: '23px', padding: '4.5px'}} className="text-white btn btn-primary"  onClick={() => navigate(`form/edit/${invoice.id}`)}/>
                             <BiTrash style={{height: '23px', width: '23px', padding: '4.5px'}} className="text-white btn btn-danger" onClick={() => handleDelete(invoice.id)}/>
