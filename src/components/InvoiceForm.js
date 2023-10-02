@@ -1,4 +1,6 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { connect } from 'react-redux';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -8,6 +10,19 @@ import Card from 'react-bootstrap/Card';
 import InvoiceItem from './InvoiceItem';
 import InvoiceModal from './InvoiceModal';
 import InputGroup from 'react-bootstrap/InputGroup';
+import withRouter from './withRouter';
+
+function MyButton() {
+  const navigate = useNavigate();
+
+  const handleButtonClick = () => {
+    navigate('/');
+  };
+
+  return (
+    <Button variant="primary" className="d-block" onClick={handleButtonClick}>Back</Button>
+  );
+}
 
 class InvoiceForm extends React.Component {
   constructor(props) {
@@ -44,6 +59,20 @@ class InvoiceForm extends React.Component {
     this.editField = this.editField.bind(this);
   }
   componentDidMount(prevProps) {
+    const { params } = this.props;
+    const { formType, id } = params;
+
+    if((formType === "edit" || formType === "create") && id != undefined) {
+      const { invoices } = this.props.invoiceList;
+      const invoice = invoices.find((invoice) => invoice.id == id);
+
+      if(!invoice) {
+        alert("Given id not found in list")
+      }
+
+      this.setState({ ...invoice });
+    }
+
     this.handleCalculateTotal()
   }
   handleRowDel(items) {
@@ -123,6 +152,16 @@ class InvoiceForm extends React.Component {
   closeModal = (event) => this.setState({isOpen: false});
   render() {
     return (<Form onSubmit={this.openModal}>
+      <Row className="my-3 align-items-center">
+  <Col md={1}>
+    <MyButton />
+  </Col>
+  <Col md={11} className="text-md-start text-center mt-2 mt-md-0">
+    <h2>
+      {this.props?.params?.formType == "edit" ? `Edit Invoice Id#: ${this.props?.params?.id}`: 'Create New Invoice'}
+      </h2>
+  </Col>
+  </Row>
       <Row>
         <Col md={8} lg={9}>
           <Card className="p-4 p-xl-5 my-3 my-xl-4">
@@ -206,7 +245,7 @@ class InvoiceForm extends React.Component {
         <Col md={4} lg={3}>
           <div className="sticky-top pt-md-3 pt-xl-4">
             <Button variant="primary" type="submit" className="d-block w-100">Review Invoice</Button>
-            <InvoiceModal showModal={this.state.isOpen} closeModal={this.closeModal} info={this.state} items={this.state.items} currency={this.state.currency} subTotal={this.state.subTotal} taxAmmount={this.state.taxAmmount} discountAmmount={this.state.discountAmmount} total={this.state.total}/>
+            <InvoiceModal showModal={this.state.isOpen} closeModal={this.closeModal} info={this.state} items={this.state.items} currency={this.state.currency} subTotal={this.state.subTotal} taxAmmount={this.state.taxAmmount} discountAmmount={this.state.discountAmmount} total={this.state.total} type={this.props?.params?.formType ?? "create"} id={this.props?.params?.id} />
             <Form.Group className="mb-3">
               <Form.Label className="fw-bold">Currency:</Form.Label>
               <Form.Select onChange={event => this.onCurrencyChange({currency: event.target.value})} className="btn btn-light my-1" aria-label="Change Currency">
@@ -245,4 +284,8 @@ class InvoiceForm extends React.Component {
   }
 }
 
-export default InvoiceForm;
+const mapStateToProps = (state) => ({
+  invoiceList: state.invoiceReducer,
+});
+
+export default connect(mapStateToProps)(withRouter(InvoiceForm));

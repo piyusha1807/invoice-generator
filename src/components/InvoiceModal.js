@@ -1,13 +1,15 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import Table from 'react-bootstrap/Table';
 import Modal from 'react-bootstrap/Modal';
-import { BiPaperPlane, BiCloudDownload } from "react-icons/bi";
+import { BiSave, BiPaperPlane, BiCloudDownload } from "react-icons/bi";
 import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf'
+import jsPDF from 'jspdf';
+import { addInvoice, editInvoice } from '../store/actions/invoiceActions';
 
 function GenerateInvoice() {
   html2canvas(document.querySelector("#invoiceCapture")).then((canvas) => {
@@ -30,6 +32,39 @@ class InvoiceModal extends React.Component {
   constructor(props) {
     super(props);
   }
+
+  saveInvoice() {
+    const obj = {
+      currency: this.props.currency||'$',
+      invoiceNumber: this.props.info.invoiceNumber||'',
+      dateOfIssue: this.props.info.dateOfIssue||'',
+      billTo: this.props.info.billTo||'',
+      billToEmail: this.props.info.billToEmail||'',
+      billToAddress: this.props.info.billToAddress||'',
+      billFrom: this.props.info.billFrom||'John Uberbacher',
+      billFromEmail: this.props.info.billFromEmail||'',
+      billFromAddress: this.props.info.billFromAddress||'',
+      items: this.props.items||[],
+      notes: this.props.info.notes,
+      total: this.props.total,
+      subTotal: this.props.subTotal,
+      taxRate: this.props.info.taxRate,
+      taxAmmount: this.props.taxAmmount,
+      discountRate: this.props.info.discountRate,
+      discountAmmount: this.props.discountAmmount
+    }
+
+    if(this.props.type == "edit") {
+      this.props.editInvoice(parseInt(this.props.id), obj);
+      alert('Invoice updated successfully!');
+    }
+    else {
+      this.props.addInvoice(obj);
+      alert('Invoice saved successfully!');
+    }
+
+  }
+
   render() {
     return(
       <div>
@@ -133,12 +168,19 @@ class InvoiceModal extends React.Component {
           </div>
           <div className="pb-4 px-4">
             <Row>
-              <Col md={6}>
-                <Button variant="primary" className="d-block w-100" onClick={GenerateInvoice}>
+              {(this.props.type === "create" || this.props.type === "edit") && (
+                <Col md={4}>
+                  <Button variant="primary" className="d-block w-100" onClick={this.saveInvoice.bind(this)}>
+                    <BiSave style={{width: '15px', height: '15px', marginTop: '-3px'}} className="me-2"/>Save Invoice
+                  </Button>
+                </Col>
+              )}
+              <Col md={this.props.type === "create"  || this.props.type === "edit" ? 4 : 6}>
+                <Button variant="outline-primary" className="d-block w-100" onClick={GenerateInvoice}>
                   <BiPaperPlane style={{width: '15px', height: '15px', marginTop: '-3px'}} className="me-2"/>Send Invoice
                 </Button>
               </Col>
-              <Col md={6}>
+              <Col md={this.props.type === "create"  || this.props.type === "edit" ? 4 : 6}>
                 <Button variant="outline-primary" className="d-block w-100 mt-3 mt-md-0" onClick={GenerateInvoice}>
                   <BiCloudDownload style={{width: '16px', height: '16px', marginTop: '-3px'}} className="me-2"/>
                   Download Copy
@@ -153,4 +195,11 @@ class InvoiceModal extends React.Component {
   }
 }
 
-export default InvoiceModal;
+const mapDispatchToProps = dispatch => {
+  return {
+    addInvoice: (data) => dispatch(addInvoice(data)),
+    editInvoice: (id, data) => dispatch(editInvoice(id, data))
+  };
+};
+
+export default connect(null, mapDispatchToProps)(InvoiceModal);
