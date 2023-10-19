@@ -4,7 +4,7 @@
 This project is designed to simplify invoice management using React and Redux. It empowers users to effortlessly create detailed invoices, specifying quantities, prices, tax rates, and discounts. Once generated, these invoices can be conveniently downloaded as PDFs. Additionally, users have the flexibility to view, edit, or delete invoices from the list. For enhanced efficiency, the system also allows for the creation of new invoices using existing data.
 
 ## Live Demo
-https://enchanting-manatee-3aab8d.netlify.app
+https://invoicelist.netlify.app/
 
 ### Screenshots
 <img src="https://i.imgur.com/E0xBXuT.png" style="max-width: 100px; width: 100%; height: auto;">
